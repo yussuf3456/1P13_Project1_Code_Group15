@@ -19,81 +19,131 @@ GRIPPER_IMPLEMENTATION = 1
 
 
 # arm.home()
-print("move arm")
+print("Initial Arm Homing Process")
+
 import csv
 import bcrypt
 import random
+
 # working inputs
 # userid="baldes"
 # password="40062"
 
+def authenticate():
+    '''this function logs the user in. It asks the user if they have an account, and if not, it calls sign_up() before authenticating. 
+    To authenticate, it compares a userid and password entered by the user to the userids and encrypted passwords stored in users.csv. 
+    If the user enters a bad userid or a non-matching password, it allows them to try again until they are successful.
+    The function returns their userid once successful There are no parametsrs and it returns the userId that the user inputs'''
 
-def main():
-    userid = authenticate()
-    # arm.home()
-    print("move arm")
+    #ask user if they already have an account
+    print("=== Warehouse Login ===")
+    haveAccount = str(input("Do you have an account? (Y/N)"))
 
-    products_list = []
-
-    while input != "Quit":
-        # arm.home()
-        print("move arm")
-        order = input()
-        products = lookup_products(order.split())
-        products_list.append(products)
-        pack_products(order)
-
-
-    complete_order(userid,products_list)
-    customer_summary(userid)
+    #loop until user enters either yes or no
+    while haveAccount != "N" and haveAccount != "Y":
+        if haveAccount != "N" or haveAccount != "Y":
+            print("Not a valid input, try again")
+        haveAccount = str(input("Do you have an account? (Y/N)"))
 
 
+    #sign up if user dosent have an account
+    if haveAccount == "N":
+            sign_up()
 
+    inputsInvalid = True
+    while inputsInvalid == True:
+        userID = input("Enter your User ID and password\nUserID:\t")
+        password = input("Password: ")
 
-def pack_products(product_list):
-    #arm.rotate_shoulder(52)
-    print("move arm")
-    #arm.rotate_base(17.5)
-    print("move arm")
-    #arm.rotate_elbow(-27)
-    print("move arm")
-    # x,y,z = arm.get_arm_position() # temp coordinates to test
-    print("move arm")
-    x,y,z = 0,0,0
+        #read stored data and check each line if it is a matching userid and password
+        file = open("users.csv","r")
+        lines = file.readlines()
+        for line in lines:
+            storedUserID, storedPass = line.strip().split(",")
 
-    for product in products:
-        if product == 'Sponge':
-            # arm.set_arm_positon(x,y,z)
-            print("move arm")
-            # arm.home()
-            print("move arm")
-        elif(product == 'Bottle'):
-            # arm.set_arm_positon(x+0.07,y,z)
-            print("move arm")
-            # arm.home()
-            print("move arm")
-        elif(product == 'Rook'):
-            # arm.set_arm_positon(x+0.14,y,z)
-            print("move arm")
-            # arm.home()
-            print("move arm")
-        elif(product == 'D12'):
-            # arm.set_arm_positon(x+0.21,y,z)
-            print("move arm")
-            # arm.home()
-            print("move arm")
-        elif(product == 'WitchHat'):
-            # arm.set_arm_positon(x+0.28,y,z)
-            print("move arm")
-            # arm.home()
-            print("move arm")
-        elif(product == 'Bowl'):
-            # arm.set_arm_positon(x+0.35,y,z)
-            print("move arm")
-            # arm.home()
-            print("move arm")
+            if storedUserID == userID:
+                if bcrypt.checkpw(password.encode("utf-8"),storedPass.encode("utf-8")):
+                    inputsInvalid = False
+
+        #tell user if they are correct or not
+        if inputsInvalid == False:
+            print("Correct Information")
         else:
-            print("Product not in stock.")
+            print("That information is incorrect try again")
+
+    file.close()
+
+    return userID
+
+
+def sign_up():
+    '''
+    function takes userinput for a username, if their username exists they are already in the system and wont be able to create a new user,
+    function takes a password and saves it to a seperate file, for the password to be saved user must create a password that contains an upper and lowercase, 
+    a digit and a passes special character.
+    '''
+
+    #variables
+    uppercase = False
+    lowercase = False
+    digit = False
+    allowedcharacters = ["!",".","@","#","$","%","^","&","*","(",")","_",'[',"]"]
+    ac = False
+    running = True
+    hasuser = False
+
+    # Read all usernames into a list
+    filelist = []
+    file = open("users.csv", "r")
+    for line in file:
+        usernames = line.strip().split(',')
+        for user in usernames:
+            if user:  # Skip empty strings
+                filelist.append(user.strip())
+    file.close()
+
+    while True:
+        userid = str(input("Create a username: "))
+
+        # reads if username already exists
+        if userid in filelist:
+            print(f"User exists, {userid}")
+        else:
+            # Get password and validate it
+            password = input(f"Welcome {userid}, create a password: ")
+
+            if len(password) < 6:
+                print("Your password must be 6 characters or longer.")
+            else:
+                # Check password requirements
+                for char in password:
+                    if char.isupper():
+                        uppercase = True
+                    if char.islower():
+                        lowercase = True
+                    if char.isdigit():
+                        digit = True
+                    if char in allowedcharacters:
+                        allowedcharacters = True
+
+                # Check if all requirements are met
+                if uppercase and lowercase and digit and allowedcharacters:
+                    file = open("users.csv", "a")
+                    hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                    file.write(f"{userid},{hash}\n") #Writes user information in file
+                    file.close()
+                    print("Account created successfully!")
+                    break
+                else:
+                    # Tell user what's to add to password
+                    if not allowedcharacters:
+                        print("Your password does not fit requirements - needs special character")
+                    elif not uppercase:
+                        print("needs uppercase")
+                    elif not lowercase:
+                        print("needs lowercase")
+                    elif not digit:
+                        print("needs digits")
 
 
 def lookup_products(products):
@@ -133,6 +183,44 @@ def lookup_products(products):
 
     return results
 
+
+def pack_products(product_list):
+    x,y,z = 0,0,0
+
+    for product in product_list:
+        if product == 'Sponge':
+            # arm.set_arm_positon(x,y,z)
+            print("Move Arm to Sponge")
+            # arm.home()
+            print("Move Arm Up & Rehome")
+        elif(product == 'Bottle'):
+            # arm.set_arm_positon(x+0.07,y,z)
+            print("Move Arm to Bottle")
+            # arm.home()
+            print("Move Arm Up & Rehome")
+        elif(product == 'Rook'):
+            # arm.set_arm_positon(x+0.14,y,z)
+            print("Move Arm Up & Rehome")
+            # arm.home()
+            print("move arm")
+        elif(product == 'D12'):
+            # arm.set_arm_positon(x+0.21,y,z)
+            print("Move Arm to D12")
+            # arm.home()
+            print("Move Arm Up & Rehome")
+        elif(product == 'WitchHat'):
+            # arm.set_arm_positon(x+0.28,y,z)
+            print("Move Arm to Witch Hat")
+            # arm.home()
+            print("Move Arm Up & Rehome")
+        elif(product == 'Bowl'):
+            # arm.set_arm_positon(x+0.35,y,z)
+            print("Move Arm to Bowl")
+            # arm.home()
+            print("Move Arm Up & Rehome")
+        else:
+            print("Product not in stock.")
+            print("ReHome Arm")
 
 
 def complete_order(userid, product_list):
@@ -208,115 +296,6 @@ def complete_order(userid, product_list):
     #complete_order("Joesph", [["apple", 322.50], ["grape", 3.00], ["orange", 1.75]])
 
 
-def authenticate():
-    '''this function logs the user in. It asks the user if they have an account, and if not, it calls sign_up() before authenticating. To authenticate, it compares a userid and password entered by the user to the userids and encrypted passwords stored in users.csv. If the user enters a bad userid or a non-matching password, it allows them to try again until they are successful. The function returns their userid once successful There are no parametsrs and it returns the userId that the user inputs'''
-
-    #ask user if they already have an account
-    haveAccount = str(input("Do you have an account? (Y/N)"))
-
-    #loop until user enters either yes or no
-    while haveAccount != "N" and haveAccount != "Y":
-        if haveAccount != "N" or haveAccount != "Y":
-            print("Not a valid input, try again")
-        haveAccount = str(input("Do you have an account? (Y/N)"))
-
-
-    #sign up if user dosent have an account
-    if haveAccount == "N":
-            sign_up()
-
-    inputsInvalid = True
-    while inputsInvalid == True:
-        userID = input("Enter your User ID and password\nUserID:\t")
-        password = input("Password: ")
-
-        #read stored data and check each line if it is a matching userid and password
-        file = open("users.csv","r")
-        lines = file.readlines()
-        for line in lines:
-            storedUserID, storedPass = line.strip().split(",")
-
-            if storedUserID == userID:
-                if bcrypt.checkpw(password.encode("utf-8"),storedPass.encode("utf-8")):
-                    inputsInvalid = False
-
-        #tell user if they are correct or not
-        if inputsInvalid == False:
-            print("Correct Information")
-        else:
-            print("That information is incorrect try again")
-
-    file.close()
-
-    return userID
-
-def sign_up():
-    '''
-    function takes userinput for a username, if their username exists they are already in the system and wont be able to create a new user, function takes a password and saves it to a seperate file, for the password to be saved user must create a password that contains an upper and lowercase, a digit and a passes special character.
-    '''
-    #variables
-    uppercase = False
-    lowercase = False
-    digit = False
-    allowedcharacters = ["!",".","@","#","$","%","^","&","*","(",")","_",'[',"]"]
-    ac = False
-    running = True
-    hasuser = False
-
-    # Read all usernames into a list
-    filelist = []
-    file = open("users.csv", "r")
-    for line in file:
-        usernames = line.strip().split(',')
-        for user in usernames:
-            if user:  # Skip empty strings
-                filelist.append(user.strip())
-    file.close()
-
-    while True:
-        userid = str(input("Create a username: "))
-
-        # reads if username already exists
-        if userid in filelist:
-            print(f"User exists, {userid}")
-        else:
-            # Get password and validate it
-            password = input(f"Welcome {userid}, create a password: ")
-
-            if len(password) < 6:
-                print("Your password must be 6 characters or longer.")
-            else:
-                # Check password requirements
-                for char in password:
-                    if char.isupper():
-                        uppercase = True
-                    if char.islower():
-                        lowercase = True
-                    if char.isdigit():
-                        digit = True
-                    if char in allowedcharacters:
-                        allowedcharacters = True
-
-                # Check if all requirements are met
-                if uppercase and lowercase and digit and allowedcharacters:
-                    file = open("users.csv", "a")
-                    hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-                    file.write(f"{userid},{hash}\n") #Writes user information in file
-                    file.close()
-                    print("Account created successfully!")
-                    break
-                else:
-                    # Tell user what's to add to password
-                    if not allowedcharacters:
-                        print("Your password does not fit requirements - needs special character")
-                    elif not uppercase:
-                        print("needs uppercase")
-                    elif not lowercase:
-                        print("needs lowercase")
-                    elif not digit:
-                        print("needs digits")
-
-
 def check(value,mainlist):
    for element in mainlist:
        if (element[0] == value):
@@ -325,6 +304,11 @@ def check(value,mainlist):
 
 
 def customer_summary(userid):
+    """
+    Reads the orders file and prints a summary for the given user.
+    Counts total orders, total amount spent, and total quantity of each product ordered.
+    Takes a userid as input.
+    """
     file = open("orders.csv", "r")
 
     order_count = 0
@@ -352,7 +336,6 @@ def customer_summary(userid):
 
     file.close()
 
-    # ---- CLEAN PRINT OUTPUT (no weird spacing) ----
     print("Customer Summary")
     print("----------------")
     print(f"User ID: {userid}")
@@ -364,6 +347,46 @@ def customer_summary(userid):
     for product in product_counts:
         print(f"{product[0]}: {product[1]}x")
 
+def main():
+
+    print("""
+$$$$$$$\      $$$$$$\      $$\   $$\     $$$$$$$$\     $$$$$$\  
+$$  __$$\    $$  __$$\     $$ |  $$ |    $$  _____|   $$  __$$\ 
+$$ |  $$ |   $$ /  $$ |    \$$\ $$  |    $$ |         $$ /  \__|
+$$$$$$$\ |   $$ |  $$ |     \$$$$  /     $$$$$\       \$$$$$$\  
+$$  __$$\    $$ |  $$ |     $$  $$<      $$  __|       \____$$\ 
+$$ |  $$ |   $$ |  $$ |    $$  /\$$\     $$ |         $$\   $$ |
+$$$$$$$  |$$\ $$$$$$  |$$\ $$ /  $$ |$$\ $$$$$$$$\ $$\\$$$$$$  |
+\_______/ \__|\______/ \__|\__|  \__|\__|\________|\__|\______/ 
+                                                                
+             BARELY ORGANIZED XPRESS EXPEDITION SERVICE
+    ----------------------------------------------------------------
+    """)
+    
+    userid = authenticate()
+
+    products_list = []
+
+    while True:
+        print("\nWelcome to B.O.X.E.S. — where our motto is we tried.")
+        order = input("Scan or type 'Quit': ")
+
+        if order.lower() == "quit":
+            break
+
+        products = lookup_products(order.split())
+
+        # flatten into a single list for final invoice
+        for item in products:
+            products_list.append(item)
+
+        # send only product NAMES to pack_products()
+        pack_products([p[0] for p in products])
+
+    complete_order(userid, products_list)
+    customer_summary(userid)
+
+
 main()
 
 #dropbox - 0.2680739285194166, -0.3182365164329308, 0.19428816893353162
@@ -371,11 +394,10 @@ main()
 #bishop Position (X, Y, Z): (0.592886197381999, 0.1127691441318727, 0.07105588040616939)
 #rook Position (X, Y, Z): (0.6046019968684281, 0.046941535675817936, 0.04127910213589611)
 #d12 Position (X, Y, Z): (0.5956763959572058, -0.01782791627094222, 0.04140932108643397)
-#conePosition (X, Y, Z): (0.593234026200123, -0.08848494629695498, 0.027868187675618883)
-#bowlPosition (X, Y, Z): (0.5922231141129967, -0.15079853440711044, 0.03030927994162788)
+#cone Position (X, Y, Z): (0.593234026200123, -0.08848494629695498, 0.027868187675618883)
+#bowl Position (X, Y, Z): (0.5922231141129967, -0.15079853440711044, 0.03030927994162788)
 #----------------------------------------------------------------------------------
 # STUDENT CODE ENDS
 # ---------------------------------------------------------------------------------
 
 # arm.end_arm_connection()
-print("move arm")
