@@ -185,39 +185,99 @@ def lookup_products(products):
 
 
 def pack_products(product_list):
-    x,y,z = 0,0,0
 
     for product in product_list:
+
         if product == 'Sponge':
-            # arm.set_arm_positon(x,y,z)
+            # arm.control_gripper(180)   # open first
+            # arm.set_arm_positon(0.5700847784455721, 0.1782455617649722, 0.09896799887592941)   # move to Sponge
             print("Move Arm to Sponge")
-            # arm.home()
+
+            # arm.control_gripper(-180)  # close to grab sponge
+            # arm.shoulder(-20)
             print("Move Arm Up & Rehome")
+
+            # arm.set_arm_positon(0.2680739285194166, -0.3182365164329308, 0.19428816893353162)  # dropbox
+            # arm.control_gripper(180)   # release
+            # arm.rotate_base(3)
+            # arm.rotate_base(-3)
+            # arm.home()
+
         elif(product == 'Bottle'):
-            # arm.set_arm_positon(x+0.07,y,z)
+            # arm.control_gripper(180)
+            # arm.set_arm_positon(0.592886197381999, 0.1127691441318727, 0.07105588040616939)   # Bottle
             print("Move Arm to Bottle")
-            # arm.home()
+
+            # arm.control_gripper(-180)
+            # arm.shoulder(-20)
             print("Move Arm Up & Rehome")
+
+            # arm.set_arm_positon(0.2680739285194166, -0.3182365164329308, 0.19428816893353162)
+            # arm.control_gripper(180)
+            # arm.rotate_base(3)
+            # arm.rotate_base(-3)
+            # arm.home()
+
         elif(product == 'Rook'):
-            # arm.set_arm_positon(x+0.14,y,z)
+            # arm.control_gripper(180)
+            # arm.set_arm_positon(0.6046019968684281, 0.046941535675817936, 0.04127910213589611)  # Rook
             print("Move Arm Up & Rehome")
-            # arm.home()
+
+            # arm.control_gripper(-180)
+            # arm.shoulder(-20)
             print("move arm")
+
+            # arm.set_arm_positon(0.2680739285194166, -0.3182365164329308, 0.19428816893353162)
+            # arm.control_gripper(180)
+            # arm.rotate_base(3)
+            # arm.rotate_base(-3)
+            # arm.home()
+
         elif(product == 'D12'):
-            # arm.set_arm_positon(x+0.21,y,z)
+            # arm.control_gripper(180)
+            # arm.set_arm_positon(0.5956763959572058, -0.01782791627094222, 0.04140932108643397)  # D12
             print("Move Arm to D12")
-            # arm.home()
+
+            # arm.control_gripper(-180)
+            # arm.shoulder(-20)
             print("Move Arm Up & Rehome")
+
+            # arm.set_arm_positon(0.2680739285194166, -0.3182365164329308, 0.19428816893353162)
+            # arm.control_gripper(180)
+            # arm.rotate_base(3)
+            # arm.rotate_base(-3)
+            # arm.home()
+
         elif(product == 'WitchHat'):
-            # arm.set_arm_positon(x+0.28,y,z)
+            # arm.control_gripper(180)
+            # arm.set_arm_positon(0.593234026200123, -0.08848494629695498, 0.027868187675618883)  # Witch Hat
             print("Move Arm to Witch Hat")
-            # arm.home()
+
+            # arm.control_gripper(-180)
+            # arm.shoulder(-20)
             print("Move Arm Up & Rehome")
+
+            # arm.set_arm_positon(0.2680739285194166, -0.3182365164329308, 0.19428816893353162)
+            # arm.control_gripper(180)
+            # arm.rotate_base(3)
+            # arm.rotate_base(-3)
+            # arm.home()
+
         elif(product == 'Bowl'):
-            # arm.set_arm_positon(x+0.35,y,z)
+            # arm.control_gripper(180)
+            # arm.set_arm_positon(0.5922231141129967, -0.15079853440711044, 0.03030927994162788)  # Bowl
             print("Move Arm to Bowl")
-            # arm.home()
+
+            # arm.control_gripper(-180)
+            # arm.shoulder(-20)
             print("Move Arm Up & Rehome")
+
+            # arm.set_arm_positon(0.2680739285194166, -0.3182365164329308, 0.19428816893353162)
+            # arm.control_gripper(180)
+            # arm.rotate_base(3)
+            # arm.rotate_base(-3)
+            # arm.home()
+
         else:
             print("Product not in stock.")
             print("ReHome Arm")
@@ -285,7 +345,7 @@ def complete_order(userid, product_list):
 
     print("------------------------------")
     print(f"Subtotal: {subtotal:>{17}.2f} $")
-    print(f"Discount: {amount_disc:>{17}.2f} %")
+    print(f"Discount: {amount_disc:>{17}.2f} $")
     print(f"Tax (13%): {tax:>{16}.2f} $")
     print("------------------------------")
     print(f"Final Total: {final_sub:>{14}.2f} $")
@@ -347,6 +407,7 @@ def customer_summary(userid):
     for product in product_counts:
         print(f"{product[0]}: {product[1]}x")
 
+
 def main():
 
     print("""
@@ -370,6 +431,7 @@ $$$$$$$  |$$\ $$$$$$  |$$\ $$ /  $$ |$$\ $$$$$$$$\ $$\\$$$$$$  |
     while True:
         print("\nWelcome to B.O.X.E.S. — where our motto is we tried.")
         order = input("Scan or type 'Quit': ")
+        #order = scan_barcode()
 
         if order.lower() == "quit":
             break
@@ -380,7 +442,6 @@ $$$$$$$  |$$\ $$$$$$  |$$\ $$ /  $$ |$$\ $$$$$$$$\ $$\\$$$$$$  |
         for item in products:
             products_list.append(item)
 
-        # send only product NAMES to pack_products()
         pack_products([p[0] for p in products])
 
     complete_order(userid, products_list)
