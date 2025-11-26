@@ -88,9 +88,6 @@ def sign_up():
     lowercase = False
     digit = False
     allowedcharacters = ["!",".","@","#","$","%","^","&","*","(",")","_",'[',"]"]
-    ac = False
-    running = True
-    hasuser = False
 
     # Read all usernames into a list
     filelist = []
@@ -462,3 +459,4 @@ main()
 # ---------------------------------------------------------------------------------
 
 # arm.end_arm_connection()
+
