@@ -87,6 +87,7 @@ def sign_up():
     uppercase = False
     lowercase = False
     digit = False
+    ac = False
     allowedcharacters = ["!",".","@","#","$","%","^","&","*","(",")","_",'[',"]"]
 
     # Read all usernames into a list
@@ -121,10 +122,10 @@ def sign_up():
                     if char.isdigit():
                         digit = True
                     if char in allowedcharacters:
-                        allowedcharacters = True
+                        ac = True
 
                 # Check if all requirements are met
-                if uppercase and lowercase and digit and allowedcharacters:
+                if uppercase and lowercase and digit and ac:
                     file = open("users.csv", "a")
                     hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
                     file.write(f"{userid},{hash}\n") #Writes user information in file
@@ -133,7 +134,7 @@ def sign_up():
                     break
                 else:
                     # Tell user what's to add to password
-                    if not allowedcharacters:
+                    if not ac:
                         print("Your password does not fit requirements - needs special character")
                     elif not uppercase:
                         print("Requires Uppercase Character")
@@ -350,10 +351,9 @@ def complete_order(userid, product_list):
 
     print(f"\nYou have placed {order_count} orders so far.\n")
 
-    #complete_order("Joesph", [["apple", 322.50], ["grape", 3.00], ["orange", 1.75]])
-
 
 def check(value,mainlist):
+   """Helper Function, check if element is in certain list, returns true or false"""
    for element in mainlist:
        if (element[0] == value):
            return True
@@ -439,7 +439,13 @@ $$$$$$$  |$$\ $$$$$$  |$$\ $$ /  $$ |$$\ $$$$$$$$\ $$\\$$$$$$  |
         for item in products:
             products_list.append(item)
 
-        pack_products([p[0] for p in products])
+       
+        #Items only
+        list_of_items = []
+        for p in products:
+            list_of_items.append(p[0])
+
+        pack_products(list_of_items)
 
     complete_order(userid, products_list)
     customer_summary(userid)
@@ -459,5 +465,3 @@ main()
 # ---------------------------------------------------------------------------------
 
 # arm.end_arm_connection()
-
-
