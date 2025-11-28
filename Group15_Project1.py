@@ -136,11 +136,11 @@ def sign_up():
                     # Tell user what's to add to password
                     if not ac:
                         print("Your password does not fit requirements - needs special character")
-                    elif not uppercase:
+                    if not uppercase:
                         print("Requires Uppercase Character")
-                    elif not lowercase:
+                    if not lowercase:
                         print("Requires Lowercase Character")
-                    elif not digit:
+                    if not digit:
                         print("Passwordd Needs Digits")
 
 
@@ -465,3 +465,4 @@ main()
 # ---------------------------------------------------------------------------------
 
 # arm.end_arm_connection()
+
