@@ -136,11 +136,11 @@ def sign_up():
                     if not allowedcharacters:
                         print("Your password does not fit requirements - needs special character")
                     elif not uppercase:
-                        print("needs uppercase")
+                        print("Requires Uppercase Character")
                     elif not lowercase:
-                        print("needs lowercase")
+                        print("Requires Lowercase Character")
                     elif not digit:
-                        print("needs digits")
+                        print("Passwordd Needs Digits")
 
 
 def lookup_products(products):
@@ -459,4 +459,5 @@ main()
 # ---------------------------------------------------------------------------------
 
 # arm.end_arm_connection()
+
 
