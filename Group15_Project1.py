@@ -33,7 +33,7 @@ def authenticate():
     '''this function logs the user in. It asks the user if they have an account, and if not, it calls sign_up() before authenticating. 
     To authenticate, it compares a userid and password entered by the user to the userids and encrypted passwords stored in users.csv. 
     If the user enters a bad userid or a non-matching password, it allows them to try again until they are successful.
-    The function returns their userid once successful There are no parametsrs and it returns the userId that the user inputs'''
+    The function returns their userid once successful There are no parameters and it returns the userId that the user inputs'''
 
     #ask user if they already have an account
     print("=== Warehouse Login ===")
@@ -77,11 +77,11 @@ def authenticate():
 
 
 def sign_up():
-    '''
+    """
     function takes userinput for a username, if their username exists they are already in the system and wont be able to create a new user,
     function takes a password and saves it to a seperate file, for the password to be saved user must create a password that contains an upper and lowercase, 
     a digit and a passes special character.
-    '''
+    """
 
     #variables
     uppercase = False
@@ -145,8 +145,8 @@ def sign_up():
 
 
 def lookup_products(products):
-    """This function looks up for the inputed product in the product.csv, and returns the user a product name and price
-    Parameter: Gets form the user,
+    """This function takes a list of product names given and matches to prexsisting product information from file
+    param: products[list],
     Return: Returns Name and Price of the product after scanning"""
     scanned = products
     for i in range(len(scanned)):
@@ -183,19 +183,20 @@ def lookup_products(products):
 
 
 def pack_products(product_list):
-
+    """Moves qarm to locations given inputted list
+     param: product_list [list] """
     for product in product_list:
 
         if product == 'Sponge':
             # arm.control_gripper(180)   # open first
-            # arm.set_arm_positon(0.5700847784455721, 0.1782455617649722, 0.09896799887592941)   # move to Sponge
+            # arm.set_arm_positon([0.5700847784455721, 0.1782455617649722, 0.09896799887592941])   # move to Sponge
             print("Move Arm to Sponge")
 
             # arm.control_gripper(-180)  # close to grab sponge
             # arm.shoulder(-20)
             print("Move Arm Up & Rehome")
 
-            # arm.set_arm_positon(0.2680739285194166, -0.3182365164329308, 0.19428816893353162)  # dropbox
+            # arm.set_arm_positon([0.2680739285194166, -0.3182365164329308, 0.19428816893353162])  # dropbox
             # arm.control_gripper(180)   # release
             # arm.rotate_base(3)
             # arm.rotate_base(-3)
@@ -203,14 +204,14 @@ def pack_products(product_list):
 
         elif(product == 'Bottle'):
             # arm.control_gripper(180)
-            # arm.set_arm_positon(0.592886197381999, 0.1127691441318727, 0.07105588040616939)   # Bottle
+            # arm.set_arm_positon([0.592886197381999, 0.1127691441318727, 0.07105588040616939])   # Bottle
             print("Move Arm to Bottle")
 
             # arm.control_gripper(-180)
             # arm.shoulder(-20)
             print("Move Arm Up & Rehome")
 
-            # arm.set_arm_positon(0.2680739285194166, -0.3182365164329308, 0.19428816893353162)
+            # arm.set_arm_positon([0.2680739285194166, -0.3182365164329308, 0.19428816893353162])
             # arm.control_gripper(180)
             # arm.rotate_base(3)
             # arm.rotate_base(-3)
@@ -218,14 +219,14 @@ def pack_products(product_list):
 
         elif(product == 'Rook'):
             # arm.control_gripper(180)
-            # arm.set_arm_positon(0.6046019968684281, 0.046941535675817936, 0.04127910213589611)  # Rook
+            # arm.set_arm_positon([0.6046019968684281, 0.046941535675817936, 0.04127910213589611])  # Rook
             print("Move Arm Up & Rehome")
 
             # arm.control_gripper(-180)
             # arm.shoulder(-20)
             print("move arm")
 
-            # arm.set_arm_positon(0.2680739285194166, -0.3182365164329308, 0.19428816893353162)
+            # arm.set_arm_positon([0.2680739285194166, -0.3182365164329308, 0.19428816893353162])
             # arm.control_gripper(180)
             # arm.rotate_base(3)
             # arm.rotate_base(-3)
@@ -233,7 +234,7 @@ def pack_products(product_list):
 
         elif(product == 'D12'):
             # arm.control_gripper(180)
-            # arm.set_arm_positon(0.5956763959572058, -0.01782791627094222, 0.04140932108643397)  # D12
+            # arm.set_arm_positon([0.5956763959572058, -0.01782791627094222, 0.04140932108643397])  # D12
             print("Move Arm to D12")
 
             # arm.control_gripper(-180)
@@ -282,7 +283,8 @@ def pack_products(product_list):
 
 
 def complete_order(userid, product_list):
-    '''This function gets user id and product list as paratmers and updates orders.csv with new orders as well as outputting a cleanly formatted receipt'''
+    """This function gets user id and product list as paratmers and updates orders.csv with new orders as well as outputting a cleanly formatted receipt
+    param: userid[string], product_list[list]"""
 
     prev_orders = []
     f = open("orders.csv","r") #Read orders that already exsit in file
@@ -317,7 +319,7 @@ def complete_order(userid, product_list):
         f.write(item) #rewrite old orders back into file
 
     f.write("")
-    f.write(new_line) #rewrite new files back into file
+    f.write(new_line) #rewrite new order back into file
     f.close()
 
     order_count = 0
@@ -440,12 +442,12 @@ $$$$$$$  |$$\ $$$$$$  |$$\ $$ /  $$ |$$\ $$$$$$$$\ $$\\$$$$$$  |
             products_list.append(item)
 
        
-        #Items only
+        #Items only removes prices
         list_of_items = []
         for p in products:
             list_of_items.append(p[0])
 
-        pack_products(list_of_items)
+        pack_products(list_of_items) #feeds list of items only into pack products
 
     complete_order(userid, products_list)
     customer_summary(userid)
